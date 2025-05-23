@@ -1,16 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>IG Unfollow Checker</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h2>IG Unfollow Checker</h2>
-  <button id="scanFollowers">Scan Followers</button>
-  <button id="scanFollowing">Scan Following</button>
-  <button id="compare">Compare</button>
-  <h3>Not Following Back:</h3>
-  <ul id="results"></ul>
-  <script src="popup.js"></script>
-</body>
+  <head>
+    <style>
+      body { font-family: sans-serif; padding: 10px; }
+      button { margin: 5px; padding: 5px 10px; width: 100px; }
+    </style>
+  </head>
+  <body>
+    <div id="mainView">
+      <button id="compareBtn">Compare</button>
+      <button id="followers">Scan Followers</button>
+      <button id="following">Scan Following</button>
+      <button id="stop">Stop</button>
+      <!-- Other buttons like Scan Followers, etc. -->
+    </div>
+  
+    <div id="compareView" style="display: none;">
+      <button id="backBtn">Back</button>
+      <div id="compareContent"></div>
+    </div>
+  
+    <script src="popup.js"></script>
+  </body>
 </html>
+

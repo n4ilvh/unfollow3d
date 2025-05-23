@@ -1,38 +1,78 @@
-function scrapeList(type) {
-  const dialog = document.querySelector("div[role='dialog'] ul")?.parentElement;
-  if (!dialog) {
-    alert("Open your followers or following list popup on Instagram first.");
-    return;
-  }
+const followers = [];
+const following = [];
+const unfollow = [];
 
-  let lastScrollTop = 0;
-  let sameScrollCount = 0;
-
-  const scrollAndCollect = () => {
-    dialog.scrollTop = dialog.scrollHeight;
-
-    if (dialog.scrollTop === lastScrollTop) {
-      sameScrollCount++;
-    } else {
-      sameScrollCount = 0;
-    }
-    lastScrollTop = dialog.scrollTop;
-
-    // If scroll position hasn't changed after 5 tries, assume loaded all
-    if (sameScrollCount >= 5) {
-      // Collect usernames
-      const users = [...dialog.querySelectorAll("ul li a")].map(a => a.textContent.trim()).filter(Boolean);
-      chrome.storage.local.set({ [type]: users });
-      alert(`${type.charAt(0).toUpperCase() + type.slice(1)} list scraped! ${users.length} users found.`);
-    } else {
-      setTimeout(scrollAndCollect, 500);
-    }
-  };
-
-  scrollAndCollect();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("scanFollowers").addEventListener("click", () => scrapeList("followers"));
-  document.getElementById("scanFollowing").addEventListener("click", () => scrapeList("following"));
+document.getElementById("followers").addEventListener("click", () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      command: "startScrolling",
+      mode: "followers",
+    });
+  });
 });
+
+document.getElementById("following").addEventListener("click", () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      command: "startScrolling",
+      mode: "following",
+    });
+  });
+});
+
+document.getElementById("stop").addEventListener("click", () => {
+  chrome.runtime.sendMessage({ command: "stopScrolling" });
+});
+
+// Use the compareBtn (not compareView div)
+document.getElementById("compareBtn").addEventListener("click", () => {
+  document.getElementById("mainView").style.display = "none";
+  document.getElementById("compareView").style.display = "block";
+
+  // Show followers and following in compareContent
+  const compareContent = document.getElementById("compareContent");
+  
+  compareContent.innerHTML = `
+    <h3>Not following you back (${unfollow.length}):</h3>
+    <ul>${unfollow.map(u => `<li>${u}</li>`).join("")}</ul>
+    <h3>Followers (${followers.length}):</h3>
+    <ul>${followers.map(u => `<li>${u}</li>`).join("")}</ul>
+    <h3>Following (${following.length}):</h3>
+    <ul>${following.map(u => `<li>${u}</li>`).join("")}</ul>
+  `;
+});
+
+document.getElementById("backBtn").addEventListener("click", () => {
+  document.getElementById("compareView").style.display = "none";
+  document.getElementById("mainView").style.display = "block";
+});
+
+
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.command === "usernamesCollected") {
+    followers.length = 0;
+    following.length = 0;
+
+    followers.push(...message.data.followers);
+    following.push(...message.data.following);
+
+    // Removes "reels" and user's username from the arrays
+    followers.splice(0, 2);
+    following.splice(0, 2);
+
+    // Find unfollowers
+    const unfollowers = findUnfollowers(following, followers);
+    unfollow.length = 0;
+    unfollow.push(...unfollowers);
+
+    console.log("Unfollowers:", unfollow);
+  }
+});
+
+
+  // Finds out who is not following the user
+  function findUnfollowers(followingList, followersList) {
+    return followingList.filter(user => !followersList.includes(user));
+  }
+  
