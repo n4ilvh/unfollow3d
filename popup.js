@@ -51,22 +51,20 @@ document.getElementById("backBtn").addEventListener("click", () => {
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.command === "usernamesCollected") {
-    followers.length = 0;
-    following.length = 0;
+    const followersList = message.data.followers.slice(2); // skip "reels" + username
+    const followingList = message.data.following.slice(2);
 
-    followers.push(...message.data.followers);
-    following.push(...message.data.following);
+    // Find users who don't follow back
+    const unfollowList = followingList.filter(user => !followersList.includes(user));
 
-    // Removes "reels" and user's username from the arrays
-    followers.splice(0, 2);
-    following.splice(0, 2);
-
-    // Find unfollowers
-    const unfollowers = findUnfollowers(following, followers);
-    unfollow.length = 0;
-    unfollow.push(...unfollowers);
-
-    console.log("Unfollowers:", unfollow);
+    // Save to chrome storage so it persists
+    chrome.storage.local.set({
+      followers: followersList,
+      following: followingList,
+      unfollow: unfollowList
+    }, () => {
+      console.log("User data saved to storage!");
+    });
   }
 });
 

@@ -3,7 +3,7 @@
   "name": "unfollow3d",
   "version": "1.0",
   "description": "Determines whos not following you back on Instagram.",
-  "permissions": ["scripting", "activeTab"],
+  "permissions": ["scripting", "activeTab", "storage"],
   "action": {
     "default_popup": "popup.html"
   },
