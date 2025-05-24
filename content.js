@@ -10,9 +10,9 @@ chrome.runtime.onMessage.addListener((message) => {
     const scrollable = findScrollableParent(centerElem);
     if (scrollable && !scrollInterval) {
       scrollInterval = setInterval(() => {
-        scrollable.scrollBy(0, 200);
+        scrollable.scrollBy(0, 999999);
         collectUsernames();
-      }, 100);
+      }, 1);
     }
   }
 
