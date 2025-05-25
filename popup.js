@@ -2,6 +2,12 @@ const followers = [];
 const following = [];
 const unfollow = [];
 
+chrome.storage.local.get(["followers", "following", "unfollow"], (result) => {
+  if (result.followers) followers.push(...result.followers);
+  if (result.following) following.push(...result.following);
+  if (result.unfollow) unfollow.push(...result.unfollow);
+});
+
 document.getElementById("followersBtn").addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, {
@@ -59,13 +65,13 @@ document.getElementById("compareBtn").addEventListener("click", () => {
 
   else {
     compareContent.innerHTML = `
-    <h3>Not following you back (${unfollow.length}):</h3>
-    <ul>${unfollow.map(u => `<li>${u}</li>`).join("")}</ul>
-    <h3>Followers (${followers.length}):</h3>
-    <ul>${followers.map(u => `<li>${u}</li>`).join("")}</ul>
-    <h3>Following (${following.length}):</h3>
-    <ul>${following.map(u => `<li>${u}</li>`).join("")}</ul>
-  `;
+  <h3>Not following you back (${unfollow.length}):</h3>
+  <ul>${unfollow.map(u => `<li><a href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+  <h3>Followers (${followers.length}):</h3>
+  <ul>${followers.map(u => `<li><a href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+  <h3>Following (${following.length}):</h3>
+  <ul>${following.map(u => `<li><a href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+`;
   }
 });
 
@@ -78,6 +84,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   unfollow.length = 0;
   followers.length = 0;
   following.length = 0;
+  chrome.storage.local.clear();
   document.getElementById("compareView").style.display = "block";
 
   const compareContent = document.getElementById("compareContent");
@@ -106,9 +113,9 @@ chrome.runtime.onMessage.addListener((message) => {
     unfollow.push(...unfollowers);
 
     chrome.storage.local.set({
-      followers: followersList,
-      following: followingList,
-      unfollow: unfollowList
+      followers: followers,
+      following: following,
+      unfollow: unfollow
     });
   }
 });
