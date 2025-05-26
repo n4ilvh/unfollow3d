@@ -66,7 +66,7 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   else {
     compareContent.innerHTML = `
   <h3>Not following you back (${unfollow.length}):</h3>
-  <ul>${unfollow.map(u => `<li><a href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+  <ul>${unfollow.map(u => `<li><a style="color:rgb(133, 51, 163)"href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
   <h3>Followers (${followers.length}):</h3>
   <ul>${followers.map(u => `<li><a href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
   <h3>Following (${following.length}):</h3>
