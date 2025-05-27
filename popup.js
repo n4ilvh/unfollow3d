@@ -76,22 +76,40 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   `;
   }
 
+//   else {
+//     compareContent.innerHTML = `
+//   <span style="color: rgb(255, 255, 255)">
+//     <h3>Not following you back (${unfollow.length}):</h3>
+//     <ul>${unfollow.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+//     <h3>Followers (${followers.length}):</h3>
+//     <ul>${followers.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+//     <h3>Following (${following.length}):</h3>
+//     <ul>${following.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+//   </span>
+// `;
+//   }
+
+
   else {
     compareContent.innerHTML = `
-  <span style="color: rgb(255, 255, 255)">
-    <h3>Not following you back (${unfollow.length}):</h3>
-    <ul>${unfollow.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
-    <h3>Followers (${followers.length}):</h3>
-    <ul>${followers.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
-    <h3>Following (${following.length}):</h3>
-    <ul>${following.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
-  </span>
-`;
+      ${createDropdown("Not Following You Back", unfollow)}
+      ${createDropdown("Followers", followers)}
+      ${createDropdown("Following", following)}
+    `;
+  
+    // Add event listeners for dropdown toggles
+    document.querySelectorAll(".dropdown-toggle").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const list = btn.nextElementSibling;
+        list.style.display = list.style.display === "none" ? "block" : "none";
+      });
+    });
   }
 });
 
 document.getElementById("backBtn").addEventListener("click", () => {
   document.getElementById("compareView").style.display = "none";
+  document.getElementById("helpView").style.display = "none";
   document.getElementById("mainView").style.display = "block";
 });
 
@@ -139,5 +157,19 @@ chrome.runtime.onMessage.addListener((message) => {
   // Finds out who is not following the user
   function findUnfollowers(followingList, followersList) {
     return followingList.filter(user => !followersList.includes(user));
+  }
+
+  // Dropdown function
+  function createDropdown(title, data) {
+    return `
+      <div style="margin-bottom: 10px;">
+        <button class="dropdown-toggle" style="background:none; border:none; color:white; font-size:16px; cursor:pointer; text-align:left; padding:5px 0;">
+          &#9654; ${title} (${data.length})
+        </button>
+        <ul style="display:none; padding-left: 20px;">
+          ${data.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}
+        </ul>
+      </div>
+    `;
   }
   
