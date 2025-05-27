@@ -67,6 +67,7 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   `;
   }
 
+  // If followers are not scanned but following is
   else if (followers.length == 0 && following.length == 0) {
     compareContent.innerHTML = `
     <span style="color: rgb(255, 255, 255)">
@@ -76,20 +77,7 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   `;
   }
 
-//   else {
-//     compareContent.innerHTML = `
-//   <span style="color: rgb(255, 255, 255)">
-//     <h3>Not following you back (${unfollow.length}):</h3>
-//     <ul>${unfollow.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
-//     <h3>Followers (${followers.length}):</h3>
-//     <ul>${followers.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
-//     <h3>Following (${following.length}):</h3>
-//     <ul>${following.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
-//   </span>
-// `;
-//   }
-
-
+  // If both following and followers are scanned
   else {
     compareContent.innerHTML = `
       ${createDropdown("Not Following You Back", unfollow)}
@@ -101,7 +89,11 @@ document.getElementById("compareBtn").addEventListener("click", () => {
     document.querySelectorAll(".dropdown-toggle").forEach(btn => {
       btn.addEventListener("click", () => {
         const list = btn.nextElementSibling;
-        list.style.display = list.style.display === "none" ? "block" : "none";
+        const arrow = btn.querySelector(".arrow");
+        const isOpen = list.style.display === "block";
+
+        list.style.display = isOpen ? "none" : "block";
+        arrow.style.transform = isOpen ? "rotate(0deg)" : "rotate(90deg)";
       });
     });
   }
@@ -162,9 +154,9 @@ chrome.runtime.onMessage.addListener((message) => {
   // Dropdown function
   function createDropdown(title, data) {
     return `
-      <div style="margin-bottom: 10px;">
-        <button class="dropdown-toggle" style="background:none; border:none; color:white; font-size:16px; cursor:pointer; text-align:left; padding:5px 0;">
-          &#9654; ${title} (${data.length})
+      <div class="dropdown" style="margin-bottom: 10px;">
+        <button class="dropdown-toggle" style="background:none; border:none; color:white; font-size:16px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <span class="arrow" style="transition: transform 0.5s;">&#9654;</span> ${title} (${data.length})
         </button>
         <ul style="display:none; padding-left: 20px;">
           ${data.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}
