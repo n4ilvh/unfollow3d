@@ -8,6 +8,13 @@ chrome.storage.local.get(["followers", "following", "unfollow"], (result) => {
   if (result.unfollow) unfollow.push(...result.unfollow);
 });
 
+// "?" is pressed
+document.getElementById("helpBtn").addEventListener("click", () =>{
+  document.getElementById("mainView").style.display = "none";
+  document.getElementById("helpView").style.display = "block";
+})
+
+// "Scan Followers" is pressed
 document.getElementById("followersBtn").addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, {
@@ -17,6 +24,7 @@ document.getElementById("followersBtn").addEventListener("click", () => {
   });
 });
 
+// "Scan Following" is pressed
 document.getElementById("followingBtn").addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, {
@@ -26,11 +34,12 @@ document.getElementById("followingBtn").addEventListener("click", () => {
   });
 });
 
+// "Stop" is pressed
 document.getElementById("stopBtn").addEventListener("click", () => {
   chrome.runtime.sendMessage({ command: "stopScrolling" });
 });
 
-// Use the compareBtn (not compareView div)
+// "Compare" is pressed
 document.getElementById("compareBtn").addEventListener("click", () => {
   document.getElementById("mainView").style.display = "none";
   document.getElementById("compareView").style.display = "block";

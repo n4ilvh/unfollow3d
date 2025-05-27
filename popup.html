@@ -11,14 +11,34 @@
   </head>
   <body>
     <div id="mainView">
+      <div style="display: flex; justify-content: center; gap: 10px">
+        <button class="glass-circle" id="helpBtn">?</button>
+        <h1 style="color: white;">unfollow3d</h1>
+        <button class="glass-circle" style="font-size: 15px;" id="moreBtn">Info</button>
+      </div>
+
+      
       <div style="display: flex; gap: 10px;">
         <button class="lato-thin" id="followersBtn">Scan Followers</button>
         <button class="lato-thin" id="followingBtn">Scan Following</button>
       </div>
-      <button class="lato-thin" id="compareBtn">Compare</button>
-      <button class="lato-thin" id="stopBtn">Stop</button>
+      <div style="display: flex; gap: 10px;">
+        <button class="lato-thin" id="compareBtn">Compare</button>
+        <button class="lato-thin" id="stopBtn">Stop</button>
+      </div>
     </div>
   
+    <!-- Help Screen -->
+    <div id="helpView" class="lato-regular" style="display:none; color: white;">
+      <p>1. Go to your Instagram profile on desktop<p>
+      <p>2. Open your follower list</p>
+      <p>3. Open the extension and press "Scan Followers"</p>
+      <p>4. When the end of the list is reached click "Stop"</p>
+      <p>5. Do the same for your following list</p>
+      <p>6. Open the extension and press "Compare"</p>
+    </div>
+
+
     <div id="compareView" style="display: none;">
       <button class="lato-thin" id="backBtn">Back</button>
       <button class="lato-thin" id="resetBtn">Reset</button>
