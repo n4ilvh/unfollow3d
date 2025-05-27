@@ -52,34 +52,40 @@ document.getElementById("compareBtn").addEventListener("click", () => {
     compareContent.innerHTML = `
     <h3>Followers not scanned</h3>
     <h3>Following (${following.length}):</h3>
-    <ul>${following.map(u => `<li>${u}</li>`).join("")}</ul>
+    <ul>${following.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
   `;
   }
 
   // If following is not scanned but followers are
   else if (!followers.length == 0 && following.length == 0) {
     compareContent.innerHTML = `
-    <h3>Following not scanned</h3>
-    <h3>Followers (${followers.length}):</h3>
-    <ul>${followers.map(u => `<li>${u}</li>`).join("")}</ul>
+    <span style="color: rgb(255, 255, 255)">
+      <h3>Following not scanned</h3>
+      <h3>Followers (${followers.length}):</h3>
+      <ul>${followers.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+    </span>
   `;
   }
 
   else if (followers.length == 0 && following.length == 0) {
     compareContent.innerHTML = `
-    <h3>Followers not scanned</h3>
-    <h3>Following not scanned</h3>
+    <span style="color: rgb(255, 255, 255)">
+      <h3>Followers not scanned</h3>
+      <h3>Following not scanned</h3>
+    </span>
   `;
   }
 
   else {
     compareContent.innerHTML = `
-  <h3>Not following you back (${unfollow.length}):</h3>
-  <ul>${unfollow.map(u => `<li><a style="color:rgb(133, 51, 163)"href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
-  <h3>Followers (${followers.length}):</h3>
-  <ul>${followers.map(u => `<li><a href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
-  <h3>Following (${following.length}):</h3>
-  <ul>${following.map(u => `<li><a href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+  <span style="color: rgb(255, 255, 255)">
+    <h3>Not following you back (${unfollow.length}):</h3>
+    <ul>${unfollow.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+    <h3>Followers (${followers.length}):</h3>
+    <ul>${followers.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+    <h3>Following (${following.length}):</h3>
+    <ul>${following.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
+  </span>
 `;
   }
 });
