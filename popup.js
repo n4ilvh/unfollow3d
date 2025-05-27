@@ -99,8 +99,13 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   }
 });
 
-document.getElementById("backBtn").addEventListener("click", () => {
+document.getElementById("compareBackBtn").addEventListener("click", () => {
   document.getElementById("compareView").style.display = "none";
+  document.getElementById("helpView").style.display = "none";
+  document.getElementById("mainView").style.display = "block";
+});
+
+document.getElementById("helpBackBtn").addEventListener("click", () => {
   document.getElementById("helpView").style.display = "none";
   document.getElementById("mainView").style.display = "block";
 });
