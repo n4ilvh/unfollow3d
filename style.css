@@ -120,3 +120,13 @@ button:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: scale(1.1);
 }
+
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
