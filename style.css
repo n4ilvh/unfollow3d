@@ -132,3 +132,22 @@ button:hover {
   object-fit: cover;
   z-index: -1;
 }
+
+.progress-container {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  height: 20px;
+  margin: 15px 0;
+  overflow: hidden;
+  box-shadow:
+    2px 2px 8px rgba(0, 0, 0, 0.2),
+    -2px -2px 8px rgba(255, 255, 255, 0.05);
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #a855f7, #7c3aed);
+  transition: width 0.3s ease-in-out;
+}

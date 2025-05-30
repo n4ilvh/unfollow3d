@@ -16,6 +16,8 @@ document.getElementById("helpBtn").addEventListener("click", () =>{
 
 // "Scan Followers" is pressed
 document.getElementById("followersBtn").addEventListener("click", () => {
+  document.getElementById("scanner").style.display = "block";
+  updateProgress(0, 0);
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, {
       command: "startScrolling",
@@ -26,6 +28,8 @@ document.getElementById("followersBtn").addEventListener("click", () => {
 
 // "Scan Following" is pressed
 document.getElementById("followingBtn").addEventListener("click", () => {
+  document.getElementById("scanner").style.display = "block";
+  updateProgress(0, 0);
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, {
       command: "startScrolling",
@@ -36,6 +40,7 @@ document.getElementById("followingBtn").addEventListener("click", () => {
 
 // "Stop" is pressed
 document.getElementById("stopBtn").addEventListener("click", () => {
+  document.getElementById("scanner").style.display = "none";
   chrome.runtime.sendMessage({ command: "stopScrolling" });
 });
 
@@ -120,7 +125,8 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   const compareContent = document.getElementById("compareContent");
   
   compareContent.innerHTML = `
-    List has been reset.
+    
+  <p style="color: white";>List has been reset.</p>
   `;
 });
 
@@ -134,8 +140,8 @@ chrome.runtime.onMessage.addListener((message) => {
     following.push(...message.data.following);
 
     // Removes "reels" and user's username from the arrays
-    followers.splice(0, 2);
-    following.splice(0, 2);
+    // followers.splice(0, 2);
+    // following.splice(0, 2);
 
     // Find unfollowers
     const unfollowers = findUnfollowers(following, followers);
@@ -169,4 +175,30 @@ chrome.runtime.onMessage.addListener((message) => {
       </div>
     `;
   }
+  
+  function updateProgress(scanned, total) {
+    const percent = total > 0 ? Math.min(100, Math.floor((scanned / total) * 100)) : 0;
+    const progressBar = document.getElementById('scanProgressBar');
+    
+    // Smooth transition
+    progressBar.style.transition = 'width 0.3s ease';
+    progressBar.style.width = percent + '%';
+    
+    document.getElementById('progressText').textContent = 
+      total > 0 ? `${percent}% scanned (${scanned}/${total})` : 'Scanning...';
+  }
+  
+  // Listen for updates from content.js
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === "progressUpdate") {
+      updateProgress(message.scanned, message.total);
+    }
+  });
+  
+  const port = chrome.runtime.connect({ name: "popup" });
+  port.onMessage.addListener((message) => {
+  if (message.command === "progressUpdate") {
+    updateProgress(message.scanned, message.total);
+  }
+});
   
