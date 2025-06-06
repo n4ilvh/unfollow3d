@@ -4,8 +4,8 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Jersey+25&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
     <style>
-      body { font-family: sans-serif; padding: 10px; background: linear-gradient(to right, #4c2570, #2b1257);}
-      button { margin: 5px; padding: 5px 10px; width: 100px; }
+      body { font-family: sans-serif; padding-top: 5px; padding-bottom: 10px; padding-left: 10px; padding-right: 10px; background: linear-gradient(to right, #4c2570, #2b1257);}
+      button { margin: 5px; padding: 5px 10px; width: 100px;}
     </style>
 
   </head>
@@ -15,11 +15,22 @@
       <video autoplay loop muted playsinline id="bg-video">
         <source src="bg.mp4" type="video/mp4">
       </video>
-      <div style="display: flex; justify-content: center; gap: 10px">
-        <button class="glass-circle" id="helpBtn">?</button>
-        <h1 style="color: white;">unfollow3d</h1>
-        <button class="glass-circle" style="font-size: 15px;" id="moreBtn">Info</button>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; height: 60px;">
+        <button
+          class="glass-circle"
+          id="helpBtn"
+          style="width: 30px; height: 30px; font-size: 20px; align-self: flex-start; margin-top: 5px;">
+          ?
+        </button>
+      
+        <div style="flex: 1; display: flex; justify-content: center;">
+          <h1 style="color: white; margin: 0;">unfollow3d</h1>
+        </div>
+      
+        <div style="width: 30px;"></div>
       </div>
+      
 
       <div style="display: flex; gap: 10px;">
         <button class="lato-thin" id="followersBtn">Scan Followers</button>
@@ -43,7 +54,7 @@
     <!-- Help Screen -->
     <div id="helpView" class="lato-regular" style="display:none; color: white; width: 246px;">
       <button class="lato-thin" id="helpBackBtn" style="width: 60px; height: 30px;">Back</button>
-      <h1 style="color: white; justify-content: center; text-align: center;">Help</h1>
+      <h1 style="color: white; justify-content: center; text-align: center; text-shadow: 0 0 10px #710f9e, 0 0 10px #710f9e, 0 0 10px #710f9e;">Help</h1>
       <p>1. Go to your Instagram profile on desktop</p>
       <p>2. Open your follower list</p>
       <p>3. Open the extension and press "Scan Followers"</p>
