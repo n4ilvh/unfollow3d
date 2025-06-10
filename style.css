@@ -151,3 +151,8 @@ button:hover {
   background: linear-gradient(to right, #a855f7, #7c3aed);
   transition: width 0.3s ease-in-out;
 }
+
+.dropdown-toggle {
+  width: 200px;
+  justify-content: center;
+}

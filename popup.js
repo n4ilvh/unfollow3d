@@ -66,15 +66,15 @@ document.getElementById("compareBtn").addEventListener("click", () => {
     compareContent.innerHTML = `
     <span style="color: rgb(255, 255, 255)">
       <h3>Following not scanned</h3>
-      <h3>Followers (${followers.length}):</h3>
-      <ul>${followers.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
     </span>
+    ${createDropdown("Followers", followers)}
   `;
   }
 
-  // If followers are not scanned but following is
+  // If nothing has been scanned
   else if (followers.length == 0 && following.length == 0) {
     compareContent.innerHTML = `
+    
     <span style="color: rgb(255, 255, 255)">
       <h3>Followers not scanned</h3>
       <h3>Following not scanned</h3>
@@ -85,6 +85,7 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   // If both following and followers are scanned
   else {
     compareContent.innerHTML = `
+      
       ${createDropdown("Not Following You Back", unfollow)}
       ${createDropdown("Followers", followers)}
       ${createDropdown("Following", following)}
@@ -92,6 +93,8 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   
     // Add event listeners for dropdown toggles
     document.querySelectorAll(".dropdown-toggle").forEach(btn => {
+      btn.style.width = "200px";
+      
       btn.addEventListener("click", () => {
         const list = btn.nextElementSibling;
         const arrow = btn.querySelector(".arrow");
@@ -115,18 +118,28 @@ document.getElementById("helpBackBtn").addEventListener("click", () => {
   document.getElementById("mainView").style.display = "block";
 });
 
+// If "Reset" is pressed
 document.getElementById("resetBtn").addEventListener("click", () => {
   unfollow.length = 0;
   followers.length = 0;
   following.length = 0;
-  chrome.storage.local.clear();
+  chrome.storage.local.set({ following: [] });
+  chrome.storage.local.set({ followers: [] });
+
+  chrome.storage.local.clear(() => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { command: "resetData" });
+    });
+  });
   document.getElementById("compareView").style.display = "block";
 
   const compareContent = document.getElementById("compareContent");
   
   compareContent.innerHTML = `
-    
   <p style="color: white";>List has been reset.</p>
+  ${createDropdown("Not Following You Back", unfollow)}
+      ${createDropdown("Followers", followers)}
+      ${createDropdown("Following", following)}
   `;
 });
 

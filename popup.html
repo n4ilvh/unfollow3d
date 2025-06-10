@@ -26,7 +26,6 @@
       
         <div style="flex: 1; display: flex; justify-content: center;">
           <img src="icons/icon large.png" width="100%">
-  
         </div>
       
         <div style="width: 30px;"></div>
@@ -66,10 +65,13 @@
     </div>
 
     <!-- Compare Screen -->
-    <div id="compareView" style="display: none;">
-      <button class="lato-thin" id="compareBackBtn">Back</button>
-      <button class="lato-thin" id="resetBtn">Reset</button>
-      <div class="lato-regular" id="compareContent"></div>
+    <div id="compareView" style="display: none; width: 230px; align-items: center;">
+      <div style="align-items: center;" >
+        <button class="lato-thin" id="compareBackBtn">Back</button>
+        <button class="lato-thin" id="resetBtn">Reset</button>
+      </div>
+      
+      <div class="lato-regular" id="compareContent" style="display: flex; flex-direction: column;  align-items: center;"></div>
     </div>
   
     <script src="popup.js"></script>

@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     currentMode = message.mode || "followers";
     scannedCount = 0;
     totalCount = 0;
-
+    console.log("Scrolling started");
     const centerElem = getElementAtCenter();
     const scrollable = findScrollableParent(centerElem);
 
@@ -35,6 +35,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         following: Array.from(following),
       },
     });
+  }
+
+  if (message.command === "resetData") {
+    console.log("resetData received in content.js");
+    followers.clear();
+    following.clear();
+    scannedCount = 0;
+    totalCount = 0;
   }
 
   if (message.action === "getProgress") {
@@ -67,7 +75,7 @@ function collectUsernames() {
   links.forEach((link) => {
     const href = link.getAttribute("href");
     if (/^\/[^/]+\/$/.test(href)) {
-      const username = href.replaceAll("/", "");
+      const username = "@" + href.replaceAll("/", "");
       if (username) {
         currentMode === "followers" 
           ? followers.add(username)
