@@ -59,6 +59,7 @@ document.getElementById("compareBtn").addEventListener("click", () => {
     <h3>Following (${following.length}):</h3>
     <ul>${following.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")}</ul>
   `;
+    dropdownListener();
   }
 
   // If following is not scanned but followers are
@@ -69,6 +70,7 @@ document.getElementById("compareBtn").addEventListener("click", () => {
     </span>
     ${createDropdown("Followers", followers)}
   `;
+    dropdownListener();
   }
 
   // If nothing has been scanned
@@ -80,6 +82,7 @@ document.getElementById("compareBtn").addEventListener("click", () => {
       <h3>Following not scanned</h3>
     </span>
   `;
+    dropdownListener();
   }
 
   // If both following and followers are scanned
@@ -90,20 +93,7 @@ document.getElementById("compareBtn").addEventListener("click", () => {
       ${createDropdown("Followers", followers)}
       ${createDropdown("Following", following)}
     `;
-  
-    // Add event listeners for dropdown toggles
-    document.querySelectorAll(".dropdown-toggle").forEach(btn => {
-      btn.style.width = "200px";
-      
-      btn.addEventListener("click", () => {
-        const list = btn.nextElementSibling;
-        const arrow = btn.querySelector(".arrow");
-        const isOpen = list.style.display === "block";
-
-        list.style.display = isOpen ? "none" : "block";
-        arrow.style.transform = isOpen ? "rotate(0deg)" : "rotate(90deg)";
-      });
-    });
+    dropdownListener();
   }
 });
 
@@ -201,6 +191,20 @@ chrome.runtime.onMessage.addListener((message) => {
       total > 0 ? `${percent}% scanned (${scanned}/${total})` : 'Scanning...';
   }
   
+  function dropdownListener(){
+    document.querySelectorAll(".dropdown-toggle").forEach(btn => {
+      btn.style.width = "200px";
+      
+      btn.addEventListener("click", () => {
+        const list = btn.nextElementSibling;
+        const arrow = btn.querySelector(".arrow");
+        const isOpen = list.style.display === "block";
+
+        list.style.display = isOpen ? "none" : "block";
+        arrow.style.transform = isOpen ? "rotate(0deg)" : "rotate(90deg)";
+      });
+    });
+  }
   // Listen for updates from content.js
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === "progressUpdate") {
