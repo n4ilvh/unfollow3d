@@ -136,10 +136,10 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   const compareContent = document.getElementById("compareContent");
   
   compareContent.innerHTML = `
-  <p style="color: white";>List has been reset.</p>
-  ${createDropdown("Not Following You Back", unfollow)}
-      ${createDropdown("Followers", followers)}
-      ${createDropdown("Following", following)}
+    <p style="color: white";>List has been reset.</p>
+    ${createDropdown("Not Following You Back", unfollow)}
+    ${createDropdown("Followers", followers)}
+    ${createDropdown("Following", following)}
   `;
 });
 
