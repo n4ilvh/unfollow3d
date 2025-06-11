@@ -37,15 +37,19 @@
         <button class="lato-thin" id="followingBtn">Scan Following</button>
       </div>
       <div style="display: flex; gap: 10px;">
-        <button class="lato-thin" id="compareBtn">Compare</button>
-        <button class="lato-thin" id="stopBtn">Stop</button>
+        <button class="lato-thin" id="compareBtn" style="width: 100%;">Compare</button>
+        
       </div>
 
       <div id="scanner" style="display: none;">
-        <div class="progress-container">
+        <div style="display: flex;">
+          <div class="progress-container">
           <div class="progress-bar" id="scanProgressBar"></div>
+          </div>
+          <button class="lato-thin" id="stopBtn">Save</button>
         </div>
-        <p id="progressText">0% scanned</p>
+        
+        <p id="progressText" style="color: white;">0% scanned</p>
       </div>
       
 

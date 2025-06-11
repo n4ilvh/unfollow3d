@@ -148,9 +148,6 @@ chrome.runtime.onMessage.addListener((message) => {
     followers.push(...message.data.followers);
     following.push(...message.data.following);
 
-    // Removes "reels" and user's username from the arrays
-    // followers.splice(0, 2);
-    // following.splice(0, 2);
 
     // Find unfollowers
     const unfollowers = findUnfollowers(following, followers);
@@ -182,7 +179,7 @@ chrome.runtime.onMessage.addListener((message) => {
         <ul style="display:none; padding-left: 20px;">
           ${
             showCount
-              ? data.map(u => `<li><a style="color:rgb(133, 51, 163)" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")
+              ? data.map(u => `<li style="list-style: none;"><a style="color:rgb(133, 51, 163); font-weight: 600;" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")
               : ""
           }
         </ul>

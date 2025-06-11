@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (scrollable && !scrollInterval) {
       scrollInterval = setInterval(() => {
-        scrollable.scrollBy(0, 999999);
+        scrollable.scrollBy(0, 99999999);
         collectUsernames();
       }, 1);
     }
@@ -71,22 +71,66 @@ function findScrollableParent(element) {
 }
 
 function collectUsernames() {
-  const links = document.querySelectorAll("a[href^='/'");
-  links.forEach((link) => {
-    const href = link.getAttribute("href");
-    if (/^\/[^/]+\/$/.test(href)) {
-      const username = "@" + href.replaceAll("/", "");
-      if (username) {
-        currentMode === "followers" 
-          ? followers.add(username)
-          : following.add(username);
-      }
-    }
-  });
+  try {
+    // 1. Find the scrollable container (more reliable than document-wide search)
+    const dialog = document.querySelector('[role="dialog"]');
+    const scrollContainer = dialog ? dialog.querySelector('div[style*="overflow"]') || dialog : document;
 
+    // 2. Find all candidate elements within the container
+    const candidates = scrollContainer.querySelectorAll('a[href^="/"]');
+    let foundCount = 0;
+    let skippedCount = 0;
+
+    candidates.forEach((link) => {
+      const href = link.getAttribute("href");
+      
+      // 3. More precise username pattern
+      if (/^\/[A-Za-z0-9_.]{1,30}\/$/.test(href) && 
+          !href.includes('/stories/') &&
+          !href.includes('/highlights/')) {
+        
+        const username = "@" + href.replaceAll("/", "");
+        
+        // 4. Better parent element detection
+        const parentElement = link.closest('div, li, section, article');
+        
+        // 5. Additional validation checks
+        const isValidUserItem = (
+          parentElement && (
+            // Check for profile image
+            parentElement.querySelector('img') ||
+            // Check for username text element
+            parentElement.querySelector('[dir="auto"]') ||
+            // Check for verified badge
+            parentElement.querySelector('[aria-label="Verified"]') ||
+            // Check for follow button
+            parentElement.querySelector('[role="button"]')
+          )
+        );
+
+        if (isValidUserItem) {
+          currentMode === "followers" 
+            ? followers.add(username)
+            : following.add(username);
+          foundCount++;
+        } else {
+          skippedCount++;
+        }
+      }
+    });
+
+    // Update progress
+    updateProgressTracking();
+
+  } catch (error) {
+    console.error("Error in collectUsernames:", error);
+  }
+}
+
+function updateProgressTracking() {
   scannedCount = currentMode === "followers" ? followers.size : following.size;
   
-  // Update total count only if we haven't set it yet or if we've scanned more than current total
+  // Only update total count if we don't have one yet or if we've exceeded it
   if (totalCount === 0 || scannedCount > totalCount) {
     totalCount = getTotalCount(currentMode);
   }
@@ -98,6 +142,23 @@ function collectUsernames() {
     mode: currentMode
   });
 }
+
+
+    // Update progress
+    scannedCount = currentMode === "followers" ? followers.size : following.size;
+    
+    if (totalCount === 0 || scannedCount > totalCount) {
+      totalCount = getTotalCount(currentMode);
+    }
+
+    chrome.runtime.sendMessage({
+      command: "progressUpdate",
+      scanned: scannedCount,
+      total: totalCount,
+      mode: currentMode
+    });
+
+ 
 
   // Update counts
   scannedCount = currentMode === "followers" ? followers.size : following.size;
