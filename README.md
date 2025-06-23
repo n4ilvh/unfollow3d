@@ -3,7 +3,7 @@ A useful chrome extension that scrapes your Instagram follower and following lis
 
 ## Installation
 - Download the extension from [chrome web store](https://chromewebstore.google.com/detail/unfollow3d/kdkgfkbcjjfohpedofakfeldkoejinpp)
-- OR download as a zip file and load it as an unpacked extension in [Chrome extensions](chrome://extensions/)
+- OR download as a zip file and load it as an unpacked extension in Chrome at chrome://extensions/
 
 ## Instructions
 1. Go to your Instagram profile on desktop
