@@ -119,7 +119,6 @@ function collectUsernames() {
       }
     });
 
-    // Update progress
     updateProgressTracking();
 
   } catch (error) {

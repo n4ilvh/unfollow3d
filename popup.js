@@ -8,11 +8,19 @@ chrome.storage.local.get(["followers", "following", "unfollow"], (result) => {
   if (result.unfollow) unfollow.push(...result.unfollow);
 });
 
-// "?" is pressed
-document.getElementById("helpBtn").addEventListener("click", () =>{
-  document.getElementById("mainView").style.display = "none";
+// "?" is pressed on the main screen
+document.getElementById("helpBtnMain").addEventListener("click", () =>{
   document.getElementById("helpView").style.display = "block";
-})
+  document.getElementById("mainView").style.display = "none";
+});
+
+// "?" is pressed on the compare screen
+document.getElementById("helpBtnCompare").addEventListener("click", () =>{
+  document.getElementById("helpView").style.display = "block";
+  document.getElementById("compareView").style.display = "none";
+});
+
+
 
 // "Scan Followers" is pressed
 document.getElementById("followersBtn").addEventListener("click", () => {
@@ -55,7 +63,7 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   // If followers are not scanned but following is
   if (followers.length == 0 && !following.length == 0){
     compareContent.innerHTML = `
-    <h3 style="color: rgb(255, 255, 255);">Followers not scanned</h3>
+    <h3 style="color: rgb(255, 255, 255); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 100;>Followers not scanned</h3>
     ${createDropdown("Not Following You Back (?)")}
     ${createDropdown("Followers (?)")}
     ${createDropdown("Following", following)}
@@ -66,12 +74,15 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   // If following is not scanned but followers are
   else if (!followers.length == 0 && following.length == 0) {
     compareContent.innerHTML = `
-    <span style="color: rgb(255, 255, 255);">
-      <h3>Following not scanned</h3>
+    <span style="color: rgba(0, 0, 0, 1); font-weight: 100; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+      <div>Following not scanned</div>
     </span>
+
+    <div style="font-size: 10px; height: 60px;"> 
     ${createDropdown("Not Following You Back (?)")}
     ${createDropdown("Followers", followers)}
     ${createDropdown("Following (?)")}
+    </div>
   `;
     dropdownListener();
   }
@@ -79,14 +90,17 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   // If nothing has been scanned
   else if (followers.length == 0 && following.length == 0) {
     compareContent.innerHTML = `
-    
-    <span style="color: rgb(255, 255, 255)">
-      <h3>Followers not scanned</h3>
-      <h3>Following not scanned</h3>
-    </span>
-    ${createDropdown("Not Following You Back (?)")}
-    ${createDropdown("Followers (?)")}
-    ${createDropdown("Following (?)")}
+    <div style="display: flex; gap: 20px; flex-direction: column;"> 
+      <span style="color: rgba(0, 0, 0, 1); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 100; align-items: center; text-align: center;">
+        <div>Followers not scanned</div>
+        <div>Following not scanned</div>
+      </span>
+      <div>
+      ${createDropdown("Not Following You Back (?)")}
+      ${createDropdown("Followers (?)")}
+      ${createDropdown("Following (?)")}
+      </div>
+    </div>
   `;
     dropdownListener();
   }
@@ -103,12 +117,14 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   }
 });
 
+// if the compare screen back button is pressed
 document.getElementById("compareBackBtn").addEventListener("click", () => {
   document.getElementById("compareView").style.display = "none";
   document.getElementById("helpView").style.display = "none";
   document.getElementById("mainView").style.display = "block";
 });
 
+// if the help screen back button is pressed
 document.getElementById("helpBackBtn").addEventListener("click", () => {
   document.getElementById("helpView").style.display = "none";
   document.getElementById("mainView").style.display = "block";
@@ -132,11 +148,19 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   const compareContent = document.getElementById("compareContent");
   
   compareContent.innerHTML = `
-    <p style="color: white";>List has been reset.</p>
-    ${createDropdown("Not Following You Back (?)")}
-    ${createDropdown("Followers (?)")}
-    ${createDropdown("Following (?)")}
+    <div style="display: flex; gap: 20px; flex-direction: column;"> 
+      <div style="color: black; font-weight: 100; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; align-items: center; text-align: center;">List has been reset.</div>
+        <div>
+          ${createDropdown("Not Following You Back (?)")}
+          ${createDropdown("Followers (?)")}
+          ${createDropdown("Following (?)")}
+          </div>
+        </div>
   `;
+
+
+
+  
 });
 
 
@@ -173,13 +197,13 @@ chrome.runtime.onMessage.addListener((message) => {
     const showCount = Array.isArray(data);
     return `
       <div class="dropdown" style="margin-bottom: 10px;">
-        <button class="dropdown-toggle" style="background:none; border:none; color:white; font-size:16px; cursor:pointer; display:flex; align-items:center; gap:6px;">
-          <span class="arrow" style="transition: transform 0.5s;">&#9654;</span> ${title}${showCount ? ` (${data.length})` : ""}
+        <button class="dropdown-toggle" style="background:white; border:none; color:black; font-size:11px; cursor:pointer; display:flex; align-items:center; gap:6px; padding: 6px;">
+          <span class="arrow" style="">&#9654;</span> ${title}${showCount ? ` (${data.length})` : ""}
         </button>
         <ul style="display:none; padding-left: 20px;">
           ${
             showCount
-              ? data.map(u => `<li style="list-style: none;"><a style="color:rgb(133, 51, 163); font-weight: 600;" href="https://instagram.com/${u}" target="_blank">${u}</a></li>`).join("")
+              ? data.map(u => `<li style="list-style: none;"><a style="color:rgba(0, 0, 255, 1); font-weight: 200;" href="https://instagram.com/${u.slice(1)}" target="_blank">${u}</a></li>`).join("")
               : ""
           }
         </ul>

@@ -1,5 +1,5 @@
-# unfollow3d
-A useful chrome extension that scrapes your Instagram follower and following list to find out who is not following you back.
+# unfollowed.exe
+A useful chrome extension that scrapes your Instagram follower and following list to find out who is not following you back. Does not require a login, meaning your account will not be at risk for botted behaviour.
 
 ## Installation
 - Download the extension.
