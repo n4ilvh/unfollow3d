@@ -218,29 +218,26 @@ button:active {
   margin: 15px 0;
 }
 
-.progress-bar {
-  width: 140px;
-  height: 20px;
-  overflow: hidden;
-  display: flex;
-  border: 2px solid #000;
-  background: #c0c0c0;
-  padding: 2px;
-  gap: 1px;
+#progressBar {
+  display: flex !important;
+  width: 140px !important;
+  height: 20px !important;
+  border: 2px solid #000 !important;
+  background: #c0c0c0 !important;
+  padding: 2px !important;
+  gap: 1px !important;
 }
 
-.progress-block {
-  flex: 1;
-  background: #000080; 
-  border: 1px solid #000;
-  opacity: 0.3;
-  transition: opacity 0.3s ease;
+#progressBar .progress-block {
+  flex: 1 !important;
+  background: #000080 !important;
+  border: 1px solid #000 !important;
+  opacity: 0.3 !important;
 }
 
-.progress-block.filled {
-  opacity: 1;
-  background: linear-gradient(to bottom, #0000ff, #00007f);
-  box-shadow: inset 1px 1px 0px #aaaaff;
+#progressBar .progress-block.filled {
+  opacity: 1 !important;
+  background: linear-gradient(to bottom, #0000ff, #00007f) !important;
 }
 
 .reset-button-container {

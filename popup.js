@@ -24,12 +24,14 @@ document.getElementById("helpBtnCompare").addEventListener("click", () =>{
 
 // "Scan Followers" is pressed
 document.getElementById("followersBtn").addEventListener("click", () => {
+  console.log("Scan Followers button clicked");
   document.getElementById("scanner").style.display = "block";
   initializeProgressBar();
   updateProgress(0, 0);
   
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0] && tabs[0].url.includes("instagram.com")) {
+      console.log("Sending startScrolling message to tab");
       chrome.tabs.sendMessage(tabs[0].id, {
         command: "startScrolling",
         mode: "followers",
@@ -37,9 +39,12 @@ document.getElementById("followersBtn").addEventListener("click", () => {
         if (chrome.runtime.lastError) {
           console.error("Error sending message:", chrome.runtime.lastError);
           document.getElementById("progressText").textContent = "Please refresh Instagram page";
+        } else {
+          console.log("Message sent successfully");
         }
       });
     } else {
+      console.log("Instagram not open");
       document.getElementById("progressText").textContent = "Please open Instagram first";
     }
   });
@@ -178,8 +183,8 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   const compareContent = document.getElementById("compareContent");
   
   compareContent.innerHTML = `
-      <div style="color: black; font-weight: 100; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; align-items: center; text-align: center; height: min-content; background-color: red;">List has been reset.</div>
         <div class="combo-container">
+            <div style="color: black; font-weight: 100; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  text-align: center; height: min-content;">List has been reset.</div>
           ${createDropdown("Not Following You Back (?)")}
           ${createDropdown("Followers (?)")}
           ${createDropdown("Following (?)")}
@@ -250,28 +255,14 @@ function createDropdown(title, data) {
   `;
 }
   
-function updateProgress(scanned, total) {
-  const percent = total > 0 ? Math.min(100, Math.floor((scanned / total) * 100)) : 0;
-  const progressBar = document.getElementById('scanProgressBar');
-  
-  // Smooth transition
-  progressBar.style.transition = 'width 0.3s ease';
-  progressBar.style.width = percent + '%';
-  
-  document.getElementById('progressText').textContent = 
-    total > 0 ? `${percent}% scanned (${scanned}/${total})` : 'Scanning...';
-}
-  
-// Listen for updates from content.js
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.type === "progressUpdate") {
-    updateProgress(message.scanned, message.total);
-  }
-});
+
 
 const port = chrome.runtime.connect({ name: "popup" });
-  port.onMessage.addListener((message) => {
+
+port.onMessage.addListener((message) => {
+  console.log("Port message received in popup:", message);
   if (message.command === "progressUpdate") {
+    console.log("Progress update via port:", message);
     updateProgress(message.scanned, message.total);
   }
 });
