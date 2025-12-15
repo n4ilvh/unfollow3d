@@ -10,21 +10,28 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     currentMode = message.mode || "followers";
     scannedCount = 0;
     totalCount = 0;
-    console.log("Scrolling started");
-    const centerElem = getElementAtCenter();
-    const scrollable = findScrollableParent(centerElem);
-
-    if (scrollable && !scrollInterval) {
-      scrollInterval = setInterval(() => {
-        scrollable.scrollBy(0, 99999999);
-        collectUsernames();
-      }, 1);
+    console.log("Scrolling started for mode:", currentMode);
+    
+    // Clear existing interval if any
+    if (scrollInterval) {
+      clearInterval(scrollInterval);
+      scrollInterval = null;
     }
-
+    
+    // Start scrolling
+    scrollInterval = setInterval(() => {
+      const scrollable = findScrollableParent(getElementAtCenter());
+      if (scrollable) {
+        scrollable.scrollBy(0, 300);
+      }
+      collectUsernames();
+    }, 100); // Increased interval for better performance
+    
     sendResponse?.({ status: "scrolling started" });
   }
 
   if (message.command === "stopScrolling") {
+    console.log("Scrolling stopped");
     clearInterval(scrollInterval);
     scrollInterval = null;
 
@@ -57,68 +64,62 @@ function getElementAtCenter() {
 }
 
 function findScrollableParent(element) {
-  while (element && element !== document.body) {
-    const style = getComputedStyle(element);
-    if (
-      (style.overflowY === "auto" || style.overflowY === "scroll") &&
-      element.scrollHeight > element.clientHeight
-    ) {
-      return element;
+  let current = element || document.body;
+  
+  while (current && current !== document.documentElement) {
+    const style = getComputedStyle(current);
+    const hasScrollableContent = current.scrollHeight > current.clientHeight;
+    
+    if ((style.overflowY === "auto" || style.overflowY === "scroll") && hasScrollableContent) {
+      return current;
     }
-    element = element.parentElement;
+    
+    current = current.parentElement;
   }
-  return null;
+  
+  // Fallback to document scrolling
+  return document.scrollingElement || document.documentElement;
 }
 
 function collectUsernames() {
   try {
-    // 1. Find the scrollable container (more reliable than document-wide search)
+    // 1. Find the scrollable container
     const dialog = document.querySelector('[role="dialog"]');
-    const scrollContainer = dialog ? dialog.querySelector('div[style*="overflow"]') || dialog : document;
-
-    // 2. Find all candidate elements within the container
+    const scrollContainer = dialog ? dialog : document;
+    
+    // 2. Find all links (Instagram usernames are usually in <a> tags)
     const candidates = scrollContainer.querySelectorAll('a[href^="/"]');
-    let foundCount = 0;
-    let skippedCount = 0;
-
+    const seen = new Set();
+    
     candidates.forEach((link) => {
       const href = link.getAttribute("href");
       
-      // 3. More precise username pattern
-      if (/^\/[A-Za-z0-9_.]{1,30}\/$/.test(href) && 
-          !href.includes('/stories/') &&
-          !href.includes('/highlights/')) {
+      // Match Instagram username pattern
+      if (href && /^\/[A-Za-z0-9_.]{1,30}\/?$/.test(href)) {
+        const username = href.replace(/^\//, '').replace(/\/$/, '');
         
-        const username = "@" + href.replaceAll("/", "");
+        // Skip if we've already seen this username
+        if (seen.has(username)) return;
+        seen.add(username);
         
-        // 4. Better parent element detection
-        const parentElement = link.closest('div, li, section, article');
-        
-        // 5. Additional validation checks
-        const isValidUserItem = (
-          parentElement && (
-            // Check for profile image
-            parentElement.querySelector('img') ||
-            // Check for username text element
-            parentElement.querySelector('[dir="auto"]') ||
-            // Check for verified badge
-            parentElement.querySelector('[aria-label="Verified"]') ||
-            // Check for follow button
-            parentElement.querySelector('[role="button"]')
-          )
-        );
-
-        if (isValidUserItem) {
-          currentMode === "followers" 
-            ? followers.add(username)
-            : following.add(username);
-          foundCount++;
-        } else {
-          skippedCount++;
+        // Validate it's a user link (not a post or story)
+        if (!href.includes('/p/') && 
+            !href.includes('/stories/') && 
+            !href.includes('/reel/') &&
+            !href.includes('/tv/')) {
+          
+          const fullUsername = "@" + username;
+          
+          if (currentMode === "followers") {
+            followers.add(fullUsername);
+          } else {
+            following.add(fullUsername);
+          }
         }
       }
     });
 
+    // Update progress
     updateProgressTracking();
 
   } catch (error) {
@@ -129,40 +130,13 @@ function collectUsernames() {
 function updateProgressTracking() {
   scannedCount = currentMode === "followers" ? followers.size : following.size;
   
-  // Only update total count if we don't have one yet or if we've exceeded it
-  if (totalCount === 0 || scannedCount > totalCount) {
+  // Try to get total count
+  if (totalCount === 0) {
     totalCount = getTotalCount(currentMode);
   }
-
-  chrome.runtime.sendMessage({
-    command: "progressUpdate",
-    scanned: scannedCount,
-    total: totalCount,
-    mode: currentMode
-  });
-}
-
-
-    // Update progress
-    scannedCount = currentMode === "followers" ? followers.size : following.size;
-    
-    if (totalCount === 0 || scannedCount > totalCount) {
-      totalCount = getTotalCount(currentMode);
-    }
-
-    chrome.runtime.sendMessage({
-      command: "progressUpdate",
-      scanned: scannedCount,
-      total: totalCount,
-      mode: currentMode
-    });
-
- 
-
-  // Update counts
-  scannedCount = currentMode === "followers" ? followers.size : following.size;
-  totalCount = getTotalCount(currentMode);
-
+  
+  console.log(`Progress: ${scannedCount}/${totalCount} (${currentMode})`);
+  
   // Send progress update
   chrome.runtime.sendMessage({
     command: "progressUpdate",
@@ -170,49 +144,46 @@ function updateProgressTracking() {
     total: totalCount,
     mode: currentMode
   });
-
+}
 
 function getTotalCount(mode) {
-  // Try to get the count from the profile header (most reliable)
-  const selector = mode === 'followers' 
-    ? 'header section ul li:nth-child(2) a span span' 
-    : 'header section ul li:nth-child(3) a span span';
+  // Try different selectors for Instagram's count display
+  const selectors = [
+    // New Instagram layout
+    `a[href$="/followers/"] span span`,
+    `a[href$="/following/"] span span`,
+    // Old layout
+    `li:nth-child(2) a span`,
+    `li:nth-child(3) a span`,
+    // Dialog header
+    '[role="dialog"] header h1',
+    '[role="dialog"] header span'
+  ];
   
-  const countElement = document.querySelector(selector);
-  if (countElement) {
-    const countText = countElement.textContent;
-    // Handle numbers like "1,234" or "12.3k"
-    return parseCountText(countText);
-  }
-
-  // If not found in header, try the dialog title (when list is open)
-  const dialogTitle = document.querySelector('[role="dialog"] header span');
-  if (dialogTitle) {
-    const titleText = dialogTitle.textContent;
-    const countMatch = titleText.match(/([\d,]+)/);
-    if (countMatch) {
-      return parseCountText(countMatch[1]);
+  for (const selector of selectors) {
+    const element = document.querySelector(selector);
+    if (element) {
+      const text = element.textContent || element.innerText;
+      const match = text.match(/[\d,]+/);
+      if (match) {
+        return parseCountText(match[0]);
+      }
     }
   }
-
-  // Final fallback - count visible list items
-  return document.querySelectorAll('[role="dialog"] ul li').length;
+  
+  return 0;
 }
 
 function parseCountText(text) {
-  // Remove commas and convert to number
-  const cleanText = text.replace(/,/g, '');
+  const clean = text.replace(/,/g, '');
   
-  // Handle "k" format (like 12.3k)
-  if (cleanText.includes('k')) {
-    return Math.floor(parseFloat(cleanText) * 1000);
+  if (clean.includes('k')) {
+    return Math.floor(parseFloat(clean) * 1000);
   }
   
-  // Handle "m" format (like 1.2m)
-  if (cleanText.includes('m')) {
-    return Math.floor(parseFloat(cleanText) * 1000000);
+  if (clean.includes('m')) {
+    return Math.floor(parseFloat(clean) * 1000000);
   }
   
-  return parseInt(cleanText, 10) || 0;
+  return parseInt(clean, 10) || 0;
 }
-

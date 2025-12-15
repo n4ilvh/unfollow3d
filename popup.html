@@ -16,33 +16,31 @@
         <div class="windowBorder">
           <div class="windowTitle">unfollowed.exe</div>
           <div class="windowBorderButtons">
-            <button id="helpBtnMain" style="width: 20px; height: 20px; font-size: 11px;"><div>?</div></button>
+            <button id="helpBtnMain" class="help-button"><div>?</div></button>
           </div>
         </div>
 
-      <div style="display: flex; gap: 10px;">
-        <button class="lato-thin" id="followersBtn">Scan Followers</button>
-        <button class="lato-thin" id="followingBtn">Scan Following</button>
-      </div>
-      <div style="display: flex; gap: 10px;">
-        <button class="lato-thin" id="compareBtn" style="width: 100%;">Compare</button>
-      </div>
-
-      <div id="scanner" style="display: none;">
-        <div style="display: flex;">
-          <div class="progress-container">
-          <div class="progress-bar" id="scanProgressBar"></div>
-          </div>
-          <button class="lato-thin" id="stopBtn">Save</button>
+        <div style="display: flex; gap: 10px;">
+          <button id="followersBtn">Scan Followers</button>
+          <button id="followingBtn">Scan Following</button>
         </div>
-        
-        <p id="progressText" style="color: white;">Scanning...</p>
-      </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="lato-thin" id="compareBtn" style="width: 100%;">Compare</button>
+        </div>
+        <div id="scanner" style="display: none;">
+          <div style="text-align: center; margin: 10px 0;">
+            <div class="progress-bar-container">
+              <div class="progress-bar" id="progressBar">
+                <!-- Progress blocks will be dynamically added here -->
+              </div>
+            </div>
+            <div id="progressText" style="color: black; margin: 5px 0; font-size: 12px; font-family: 'Segoe UI';">Scanning...</div>
+            <button id="stopBtn" style="width: 80px; height: 25px; font-size: 12px; margin-top: 5px;">Stop</button>
+          </div>
+        </div>
       </div>
     </div>
   
-
-
 
     <!-- Help Screen -->
     <div id="helpView" style="display:none; color: rgb(0, 0, 0); width: 230px;">
@@ -51,20 +49,21 @@
           <div class="windowBorder">
             <div class="windowTitle">unfollowed.exe</div>
             <div class="windowBorderButtons">
-              <button id="helpBackBtn" style="width: 20px; height: 20px; font-size: 9px;"><div>&larr;</div></button>
+              <button id="helpBackBtn" class="back-button"><div>&larr;</div></button>
+              <button id="helpBackBtn" class="help-button-clicked"><div>?</div></button>
             </div>
           </div>
           <div class="help-text"> 
             <div class="help-text-title"><u>Help</u></div>
             <div class="help-text-description">
               <div>1. Go to your <a href="https://www.instagram.com/" target="_blank">Instagram</a> profile</div>
-              <div>2. Open your follower list</div>
+              <div>2. Open your followers tab</div>
               <div>3. Open unfollowed.exe and &nbsp;&nbsp;&nbsp;&nbsp;press&nbsp;<span style="font-weight: 200;">'Scan Followers'</span></div>
               <div>4. When the end of the list is reached &nbsp;&nbsp;&nbsp;&nbsp;click&nbsp;<span style="font-weight: 200;">'Save'</span></div>
-              <div>5. Do the same for your following list</div>
+              <div>5. Do the same for your following tab</div>
               <div>6. Open unfollowed.exe and press   &nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight: 200;">'Compare'</span></div>
-              <div class="help-text-important"><u>Important: Do not leave the tab while scanning!</u></div>
             </div>
+            <div class="help-text-important"><u>Important: Do not leave the tab while scanning!</u></div>
           </div>
         </div>
       </div>
@@ -72,24 +71,21 @@
 
     <!-- Compare Screen -->
     <div id="compareView" style="display: none; width: 230px; align-items: center;">
-      <div class="window" style="width: 100%; height: 100%;">
+      <div class="window" style="display: flex; flex: 1; flex-direction: column; width: 100%; height: 100%;">
         <div class="windowBorder">
           <div class="windowTitle">unfollowed.exe</div>
           <div class="windowBorderButtons">
+            <button id="compareBackBtn" class="back-button"><div>&larr;</div></button>
             <button id="helpBtnCompare" style="width: 20px; height: 20px; font-size: 11px;"><div>?</div></button>
           </div>
         </div>
-
-    
-      <div style="align-items: center;" >
-        <button id="compareBackBtn">Back</button>
-        <button id="resetBtn">Reset</button>
+        <div id="compareContent" class="compare-content"></div>
+        <div class="reset-button-container">
+          <button id="resetBtn" style="width: 60px; font-size: 11px;">Reset</button>
+          <button id="" style="width: 60px; font-size: 11px;">Download CSV</button>
+        </div>
       </div>
-      
-      <div id="compareContent" style="display: flex; flex-direction: column;  align-items: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"></div>
     </div>
-    </div>
-  
     <script src="popup.js"></script>
   </body>
 </html>

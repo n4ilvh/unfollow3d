@@ -25,24 +25,46 @@ document.getElementById("helpBtnCompare").addEventListener("click", () =>{
 // "Scan Followers" is pressed
 document.getElementById("followersBtn").addEventListener("click", () => {
   document.getElementById("scanner").style.display = "block";
+  initializeProgressBar();
   updateProgress(0, 0);
+  
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, {
-      command: "startScrolling",
-      mode: "followers",
-    });
+    if (tabs[0] && tabs[0].url.includes("instagram.com")) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        command: "startScrolling",
+        mode: "followers",
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error("Error sending message:", chrome.runtime.lastError);
+          document.getElementById("progressText").textContent = "Please refresh Instagram page";
+        }
+      });
+    } else {
+      document.getElementById("progressText").textContent = "Please open Instagram first";
+    }
   });
 });
 
 // "Scan Following" is pressed
 document.getElementById("followingBtn").addEventListener("click", () => {
   document.getElementById("scanner").style.display = "block";
+  initializeProgressBar();
   updateProgress(0, 0);
+  
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, {
-      command: "startScrolling",
-      mode: "following",
-    });
+    if (tabs[0] && tabs[0].url.includes("instagram.com")) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        command: "startScrolling",
+        mode: "following",
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error("Error sending message:", chrome.runtime.lastError);
+          document.getElementById("progressText").textContent = "Please refresh Instagram page";
+        }
+      });
+    } else {
+      document.getElementById("progressText").textContent = "Please open Instagram first";
+    }
   });
 });
 
@@ -63,57 +85,65 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   // If followers are not scanned but following is
   if (followers.length == 0 && !following.length == 0){
     compareContent.innerHTML = `
-    <h3 style="color: rgb(255, 255, 255); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 100;>Followers not scanned</h3>
-    ${createDropdown("Not Following You Back (?)")}
-    ${createDropdown("Followers (?)")}
-    ${createDropdown("Following", following)}
+    <div class="combo-container"> 
+      ${createDropdown("Not following you back (?)")}
+      ${createDropdown("Followers not scanned")}
+      ${createDropdown("Following", following)}
+    </div>
   `;
-    dropdownListener();
   }
 
   // If following is not scanned but followers are
   else if (!followers.length == 0 && following.length == 0) {
     compareContent.innerHTML = `
-    <span style="color: rgba(0, 0, 0, 1); font-weight: 100; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-      <div>Following not scanned</div>
-    </span>
-
-    <div style="font-size: 10px; height: 60px;"> 
-    ${createDropdown("Not Following You Back (?)")}
+    <div class="combo-container"> 
+    ${createDropdown("Not following you back (?)")}
     ${createDropdown("Followers", followers)}
-    ${createDropdown("Following (?)")}
+    ${createDropdown("Following not scanned")}
     </div>
   `;
-    dropdownListener();
   }
 
   // If nothing has been scanned
   else if (followers.length == 0 && following.length == 0) {
     compareContent.innerHTML = `
-    <div style="display: flex; gap: 20px; flex-direction: column;"> 
-      <span style="color: rgba(0, 0, 0, 1); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 100; align-items: center; text-align: center;">
-        <div>Followers not scanned</div>
-        <div>Following not scanned</div>
-      </span>
-      <div>
-      ${createDropdown("Not Following You Back (?)")}
-      ${createDropdown("Followers (?)")}
-      ${createDropdown("Following (?)")}
-      </div>
+    <div class="combo-container"> 
+      ${createDropdown("Not following you back (?)")}
+      ${createDropdown("Followers not scanned")}
+      ${createDropdown("Following not scanned")}
     </div>
   `;
-    dropdownListener();
   }
 
   // If both following and followers are scanned
   else {
     compareContent.innerHTML = `
-      
-      ${createDropdown("Not Following You Back", unfollow)}
-      ${createDropdown("Followers", followers)}
-      ${createDropdown("Following", following)}
+      <div class="combo-container"> 
+        ${createDropdown("Not following you back", unfollow)}
+        ${createDropdown("Followers", followers)}
+        ${createDropdown("Following", following)}
+      </div>
     `;
-    dropdownListener();
+  }
+});
+
+
+// if combo box is clicked
+document.addEventListener("click", e => {
+  const combo = e.target.closest(".combo");
+
+  document.querySelectorAll(".combo-list").forEach(list => {
+    if (!combo || !list.parentElement.contains(e.target)) {
+      list.style.display = "none";
+    }
+  });
+
+  if (!combo) return;
+
+  if (e.target.classList.contains("combo-arrow") ||
+      e.target.classList.contains("combo-input")) {
+    const list = combo.querySelector(".combo-list");
+    list.style.display = list.style.display === "block" ? "none" : "block";
   }
 });
 
@@ -148,24 +178,26 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   const compareContent = document.getElementById("compareContent");
   
   compareContent.innerHTML = `
-    <div style="display: flex; gap: 20px; flex-direction: column;"> 
-      <div style="color: black; font-weight: 100; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; align-items: center; text-align: center;">List has been reset.</div>
-        <div>
+      <div style="color: black; font-weight: 100; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; align-items: center; text-align: center; height: min-content; background-color: red;">List has been reset.</div>
+        <div class="combo-container">
           ${createDropdown("Not Following You Back (?)")}
           ${createDropdown("Followers (?)")}
           ${createDropdown("Following (?)")}
           </div>
         </div>
+    </div>
   `;
-
-
-
-  
 });
 
 
 chrome.runtime.onMessage.addListener((message) => {
+  if (message.command === "progressUpdate") {
+    console.log("Progress update:", message);
+    updateProgress(message.scanned, message.total);
+  }
+  
   if (message.command === "usernamesCollected") {
+    document.getElementById("scanner").style.display = "none";
     followers.length = 0;
     following.length = 0;
 
@@ -187,67 +219,136 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 
-  // Finds out who is not following the user
-  function findUnfollowers(followingList, followersList) {
-    return followingList.filter(user => !followersList.includes(user));
-  }
+// Finds out who is not following the user
+function findUnfollowers(followingList, followersList) {
+  return followingList.filter(user => !followersList.includes(user));
+}
 
-  // Dropdown function
-  function createDropdown(title, data) {
-    const showCount = Array.isArray(data);
-    return `
-      <div class="dropdown" style="margin-bottom: 10px;">
-        <button class="dropdown-toggle" style="background:white; border:none; color:black; font-size:11px; cursor:pointer; display:flex; align-items:center; gap:6px; padding: 6px;">
-          <span class="arrow" style="">&#9654;</span> ${title}${showCount ? ` (${data.length})` : ""}
-        </button>
-        <ul style="display:none; padding-left: 20px;">
-          ${
-            showCount
-              ? data.map(u => `<li style="list-style: none;"><a style="color:rgba(0, 0, 255, 1); font-weight: 200;" href="https://instagram.com/${u.slice(1)}" target="_blank">${u}</a></li>`).join("")
-              : ""
-          }
-        </ul>
+// Dropdown function
+function createDropdown(title, data) {
+  const hasData = Array.isArray(data);
+
+  return `
+    <div class="combo">
+      <div class="combo-input">
+        ${title}${hasData ? ` (${data.length})` : ""}
       </div>
-    `;
-  }
-  
-  function updateProgress(scanned, total) {
-    const percent = total > 0 ? Math.min(100, Math.floor((scanned / total) * 100)) : 0;
-    const progressBar = document.getElementById('scanProgressBar');
-    
-    // Smooth transition
-    progressBar.style.transition = 'width 0.3s ease';
-    progressBar.style.width = percent + '%';
-    
-    document.getElementById('progressText').textContent = 
-      total > 0 ? `${percent}% scanned (${scanned}/${total})` : 'Scanning...';
-  }
-  
-  function dropdownListener(){
-    document.querySelectorAll(".dropdown-toggle").forEach(btn => {
-      btn.style.width = "200px";
-      
-      btn.addEventListener("click", () => {
-        const list = btn.nextElementSibling;
-        const arrow = btn.querySelector(".arrow");
-        const isOpen = list.style.display === "block";
+      <div class="combo-arrow"></div>
 
-        list.style.display = isOpen ? "none" : "block";
-        arrow.style.transform = isOpen ? "rotate(0deg)" : "rotate(90deg)";
-      });
-    });
-  }
-  // Listen for updates from content.js
-  chrome.runtime.onMessage.addListener((message) => {
-    if (message.type === "progressUpdate") {
-      updateProgress(message.scanned, message.total);
-    }
-  });
+      <div class="combo-list">
+        ${
+          hasData
+            ? data.map(u => `
+              <div class="combo-item">
+                <a href="https://instagram.com/${u.slice(1)}" target="_blank">${u}</a>
+              </div>
+            `).join("")
+            : ""
+        }
+      </div>
+    </div>
+  `;
+}
   
-  const port = chrome.runtime.connect({ name: "popup" });
+function updateProgress(scanned, total) {
+  const percent = total > 0 ? Math.min(100, Math.floor((scanned / total) * 100)) : 0;
+  const progressBar = document.getElementById('scanProgressBar');
+  
+  // Smooth transition
+  progressBar.style.transition = 'width 0.3s ease';
+  progressBar.style.width = percent + '%';
+  
+  document.getElementById('progressText').textContent = 
+    total > 0 ? `${percent}% scanned (${scanned}/${total})` : 'Scanning...';
+}
+  
+// Listen for updates from content.js
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "progressUpdate") {
+    updateProgress(message.scanned, message.total);
+  }
+});
+
+const port = chrome.runtime.connect({ name: "popup" });
   port.onMessage.addListener((message) => {
   if (message.command === "progressUpdate") {
     updateProgress(message.scanned, message.total);
   }
 });
+
+function initializeProgressBar() {
+  const progressBar = document.getElementById('progressBar');
+  if (!progressBar) {
+    console.error("Progress bar element not found!");
+    return;
+  }
+  
+  console.log("Initializing progress bar...");
+  progressBar.innerHTML = ''; // Clear existing blocks
+  
+  // Create 10 progress blocks (fits better in 140px width)
+  for (let i = 0; i < 10; i++) {
+    const block = document.createElement('div');
+    block.className = 'progress-block';
+    block.style.backgroundColor = '#000080'; // Ensure color is set
+    block.style.opacity = '0.3'; // Start with low opacity
+    progressBar.appendChild(block);
+  }
+  
+  console.log(`Created ${progressBar.children.length} progress blocks`);
+}
+
+function updateProgress(scanned, total) {
+  const progressText = document.getElementById('progressText');
+  const progressBar = document.getElementById('progressBar');
+  
+  if (!progressText) {
+    console.error("Progress text element not found!");
+    return;
+  }
+  
+  if (!progressBar) {
+    console.error("Progress bar element not found!");
+    return;
+  }
+  
+  console.log(`updateProgress called: scanned=${scanned}, total=${total}`);
+  
+  // Calculate percentage
+  let percent = 0;
+  if (total > 0) {
+    percent = Math.min(100, Math.floor((scanned / total) * 100));
+  }
+  
+  // Update progress blocks
+  const blocks = progressBar.querySelectorAll('.progress-block');
+  console.log(`Found ${blocks.length} progress blocks`);
+  
+  const blocksToFill = Math.floor((percent / 100) * blocks.length);
+  console.log(`Filling ${blocksToFill} out of ${blocks.length} blocks (${percent}%)`);
+  
+  blocks.forEach((block, index) => {
+    if (index < blocksToFill) {
+      block.classList.add('filled');
+      block.style.opacity = '1';
+      block.style.backgroundColor = '#000080';
+    } else {
+      block.classList.remove('filled');
+      block.style.opacity = '0.3';
+      block.style.backgroundColor = '#000080';
+    }
+  });
+  
+  // Update text
+  if (total > 0) {
+    progressText.textContent = `Scanned: ${scanned} of ${total} (${percent}%)`;
+  } else {
+    progressText.textContent = `Scanned: ${scanned} users`;
+  }
+  
+  // Force a repaint
+  progressBar.style.display = 'none';
+  progressBar.offsetHeight; // Trigger reflow
+  progressBar.style.display = 'flex';
+}
   

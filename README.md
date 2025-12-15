@@ -2,6 +2,7 @@
 A useful chrome extension that scrapes your Instagram follower and following list to find out who is not following you back. Does not require a login, meaning your account will not be at risk for botted behaviour.
 
 ## Installation
+- Download from [Chrome Webstore](https://chromewebstore.google.com/detail/unfollow3d/kdkgfkbcjjfohpedofakfeldkoejinpp)
 - Download the extension.
 - Load it as an unpacked extension in Chrome at `chrome://extensions/`.
 
