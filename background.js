@@ -72,7 +72,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     chrome.downloads.download({
       url,
-      filename: "instagram-data.csv",
+      filename: `unfollowed-log-${fileTimestamp()}.csv`,
       saveAs: true
     });
   }
@@ -83,3 +83,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   
   return true; // Keep message channel open for async response
 });
+
+function fileTimestamp() {
+  return new Date().toISOString().slice(0, 10);
+}

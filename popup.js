@@ -206,11 +206,11 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   `;
 });
 
+
+
 document.getElementById("csvBtn").addEventListener("click", () => {
-  downloadCSV(followers);
+  downloadCSV(findUnfollowers(following, followers));
 });
-
-
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.command === "progressUpdate") {
@@ -239,7 +239,6 @@ chrome.runtime.onMessage.addListener((message) => {
     });
   }
 });
-
 
 // Finds out who is not following the user
 function findUnfollowers(followingList, followersList) {
@@ -361,9 +360,7 @@ function updateProgress(scanned, total) {
 }
 
 function downloadCSV(data) {
-  const csv =
-    "users not following you back:\n" +
-    data.map(u => u.replace("@", "")).join("\n");
+  let csv = "Unfollowed.exe log - " + `[${new Date().toLocaleString()}]\n\n` + "not following you:\n" + data.map(u => u.replace("@", "")).join("\n");
 
   chrome.runtime.sendMessage({
     type: "DOWNLOAD_CSV",
@@ -371,6 +368,3 @@ function downloadCSV(data) {
   });
 }
 
-function getDateTime() {
-  return new Date().toLocaleString();
-}
