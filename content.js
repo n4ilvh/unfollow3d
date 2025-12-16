@@ -187,3 +187,4 @@ function parseCountText(text) {
   
   return parseInt(clean, 10) || 0;
 }
+

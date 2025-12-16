@@ -34,8 +34,8 @@
                 <!-- Progress blocks will be dynamically added here -->
               </div>
             </div>
-            <div id="progressText" style="color: black; margin: 5px 0; font-size: 12px; font-family: 'Segoe UI';">Scanning...</div>
-            <button id="stopBtn" style="width: 80px; height: 25px; font-size: 12px; margin-top: 5px;">Stop</button>
+            <div id="progressText" class="progress-text">Scanning...</div>
+            <button id="stopBtn" style="width: 80px; height: 25px; font-size: 12px; margin-top: 5px;">Save</button>
           </div>
         </div>
       </div>
@@ -70,8 +70,8 @@
     </div>
 
     <!-- Compare Screen -->
-    <div id="compareView" style="display: none; width: 230px; align-items: center;">
-      <div class="window" style="display: flex; flex: 1; flex-direction: column; width: 100%; height: 100%;">
+    <div id="compareView" style="display: none; width: 230px; height: 220px; align-items: center;">
+      <div class="window" style="display: flex; flex: 1; flex-direction: column; width: 100%; height: 220px;">
         <div class="windowBorder">
           <div class="windowTitle">unfollowed.exe</div>
           <div class="windowBorderButtons">
@@ -82,7 +82,7 @@
         <div id="compareContent" class="compare-content"></div>
         <div class="reset-button-container">
           <button id="resetBtn" style="width: 100px; font-size: 11px;">Reset</button>
-          <button id="" style="width: 100px; font-size: 11px;">Download CSV</button>
+          <button id="csvBtn" style="width: 100px; font-size: 11px;">Download CSV</button>
         </div>
       </div>
     </div>

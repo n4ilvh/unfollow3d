@@ -62,6 +62,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       console.log("Direct runtime message failed (popup closed):", err);
     });
   }
+
+  
+  if (message.type === "DOWNLOAD_CSV") {
+    const csv = message.csv;
+
+    const url =
+      "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+
+    chrome.downloads.download({
+      url,
+      filename: "instagram-data.csv",
+      saveAs: true
+    });
+  }
+  
+
+
+
   
   return true; // Keep message channel open for async response
 });

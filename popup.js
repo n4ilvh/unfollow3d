@@ -38,6 +38,7 @@ document.getElementById("followersBtn").addEventListener("click", () => {
       }, (response) => {
         if (chrome.runtime.lastError) {
           console.error("Error sending message:", chrome.runtime.lastError);
+          document.getElementById("stopBtn").style.display = "none";
           document.getElementById("progressText").textContent = "Please refresh Instagram page";
         } else {
           console.log("Message sent successfully");
@@ -45,6 +46,7 @@ document.getElementById("followersBtn").addEventListener("click", () => {
       });
     } else {
       console.log("Instagram not open");
+      document.getElementById("stopBtn").style.display = "none";
       document.getElementById("progressText").textContent = "Please open Instagram first";
     }
   });
@@ -73,7 +75,7 @@ document.getElementById("followingBtn").addEventListener("click", () => {
   });
 });
 
-// "Stop" is pressed
+// "save" is pressed
 document.getElementById("stopBtn").addEventListener("click", () => {
   document.getElementById("scanner").style.display = "none";
   chrome.runtime.sendMessage({ command: "stopScrolling" });
@@ -89,6 +91,8 @@ document.getElementById("compareBtn").addEventListener("click", () => {
   
   // If followers are not scanned but following is
   if (followers.length == 0 && !following.length == 0){
+    document.getElementById("csvBtn").style.display = "none";
+    document.getElementById("resetBtn").style.display = "block";
     compareContent.innerHTML = `
     <div class="combo-container"> 
       ${createDropdown("Not following you back (?)")}
@@ -100,6 +104,8 @@ document.getElementById("compareBtn").addEventListener("click", () => {
 
   // If following is not scanned but followers are
   else if (!followers.length == 0 && following.length == 0) {
+    document.getElementById("csvBtn").style.display = "none";
+    document.getElementById("resetBtn").style.display = "block";
     compareContent.innerHTML = `
     <div class="combo-container"> 
     ${createDropdown("Not following you back (?)")}
@@ -111,6 +117,8 @@ document.getElementById("compareBtn").addEventListener("click", () => {
 
   // If nothing has been scanned
   else if (followers.length == 0 && following.length == 0) {
+    document.getElementById("csvBtn").style.display = "none";
+    document.getElementById("resetBtn").style.display = "none";
     compareContent.innerHTML = `
     <div class="combo-container"> 
       ${createDropdown("Not following you back (?)")}
@@ -122,6 +130,8 @@ document.getElementById("compareBtn").addEventListener("click", () => {
 
   // If both following and followers are scanned
   else {
+    document.getElementById("resetBtn").style.display = "block";
+    document.getElementById("csvBtn").style.display = "block";
     compareContent.innerHTML = `
       <div class="combo-container"> 
         ${createDropdown("Not following you back", unfollow)}
@@ -167,6 +177,8 @@ document.getElementById("helpBackBtn").addEventListener("click", () => {
 
 // If "Reset" is pressed
 document.getElementById("resetBtn").addEventListener("click", () => {
+  document.getElementById("resetBtn").style.display = "none";
+  document.getElementById("csvBtn").style.display = "none";
   unfollow.length = 0;
   followers.length = 0;
   following.length = 0;
@@ -193,6 +205,11 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     </div>
   `;
 });
+
+document.getElementById("csvBtn").addEventListener("click", () => {
+  downloadCSV(followers);
+});
+
 
 
 chrome.runtime.onMessage.addListener((message) => {
@@ -342,4 +359,18 @@ function updateProgress(scanned, total) {
   progressBar.offsetHeight; // Trigger reflow
   progressBar.style.display = 'flex';
 }
-  
+
+function downloadCSV(data) {
+  const csv =
+    "users not following you back:\n" +
+    data.map(u => u.replace("@", "")).join("\n");
+
+  chrome.runtime.sendMessage({
+    type: "DOWNLOAD_CSV",
+    csv
+  });
+}
+
+function getDateTime() {
+  return new Date().toLocaleString();
+}
