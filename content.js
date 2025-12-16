@@ -4,6 +4,7 @@ const following = new Set();
 let currentMode = "followers";
 let scannedCount = 0;
 let totalCount = 0;
+let totalMode = null;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.command === "startScrolling") {
@@ -128,16 +129,24 @@ function collectUsernames() {
 }
 
 function updateProgressTracking() {
-  scannedCount = currentMode === "followers" ? followers.size : following.size;
-  
-  // Try to get total count
-  if (totalCount === 0) {
-    totalCount = getTotalCount(currentMode);
+  scannedCount = currentMode === "followers"
+    ? followers.size
+    : following.size;
+
+  // Recalculate total when mode changes
+  if (totalMode !== currentMode) {
+    totalCount = 0;
+    totalMode = currentMode;
   }
-  
+
+  // Only set total when dialog header matches mode
+  const detectedTotal = getTotalCountFromDialog(currentMode);
+  if (detectedTotal > 0) {
+    totalCount = detectedTotal;
+  }
+
   console.log(`Progress: ${scannedCount}/${totalCount} (${currentMode})`);
-  
-  // Send progress update
+
   chrome.runtime.sendMessage({
     command: "progressUpdate",
     scanned: scannedCount,
@@ -146,32 +155,19 @@ function updateProgressTracking() {
   });
 }
 
-function getTotalCount(mode) {
-  // Try different selectors for Instagram's count display
-  const selectors = [
-    // New Instagram layout
-    `a[href$="/followers/"] span span`,
-    `a[href$="/following/"] span span`,
-    // Old layout
-    `li:nth-child(2) a span`,
-    `li:nth-child(3) a span`,
-    // Dialog header
-    '[role="dialog"] header h1',
-    '[role="dialog"] header span'
-  ];
-  
-  for (const selector of selectors) {
-    const element = document.querySelector(selector);
-    if (element) {
-      const text = element.textContent || element.innerText;
-      const match = text.match(/[\d,]+/);
-      if (match) {
-        return parseCountText(match[0]);
-      }
-    }
-  }
-  
-  return 0;
+
+function getTotalCountFromDialog(mode) {
+  const selector =
+    mode === "followers"
+      ? `a[href$="/followers/"] span span`
+      : `a[href$="/following/"] span span`;
+
+  const element = document.querySelector(selector);
+  if (!element) return 0;
+
+  const text = element.textContent || element.innerText;
+  const match = text.match(/[\d,.kKmM]+/);
+  return match ? parseCountText(match[0]) : 0;
 }
 
 function parseCountText(text) {
