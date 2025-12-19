@@ -3,7 +3,7 @@
   "name": "unfollowed.exe",
   "version": "2.1",
   "description": "Determines whos not following you back on Instagram.",
-  "permissions": ["scripting", "activeTab", "storage", "downloads"],
+  "permissions": ["activeTab", "storage", "downloads"],
   "action": {
     "default_popup": "popup.html"
   },
